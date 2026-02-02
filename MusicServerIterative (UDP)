@@ -1,0 +1,49 @@
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+
+public class MusicServerIterative {
+
+    public static void main(String[] args) {
+        int port = 9876;
+
+        try (DatagramSocket socket = new DatagramSocket(port)) {
+            System.out.println("Music Server avviato sulla porta " + port);
+
+            byte[] receiveBuffer = new byte[1024];
+
+            while (true) {
+                DatagramPacket receivePacket =
+                        new DatagramPacket(receiveBuffer, receiveBuffer.length);
+
+                socket.receive(receivePacket);
+
+                InetAddress clientAddress = receivePacket.getAddress();
+                int clientPort = receivePacket.getPort();
+
+                String request = new String(
+                        receivePacket.getData(), 0, receivePacket.getLength());
+
+                String response;
+
+                if (request.startsWith("GET_SONG")) {
+                    response = "Invio canzone richiesta (simulata)";
+                } else if (request.startsWith("MASHUP")) {
+                    response = MashupService.createMashup(request);
+                } else {
+                    response = "Comando non riconosciuto";
+                }
+
+                byte[] sendBuffer = response.getBytes();
+                DatagramPacket sendPacket =
+                        new DatagramPacket(sendBuffer, sendBuffer.length,
+                                clientAddress, clientPort);
+
+                socket.send(sendPacket);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
