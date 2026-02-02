@@ -1,0 +1,6 @@
+public class MashupService {
+
+    public static String createMashup(String request) {
+        return "Mashup creato con successo (simulazione)";
+    }
+}
